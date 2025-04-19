@@ -2,14 +2,6 @@ import React from 'react';
 // Import Premium components and types
 import {
   DataGridPremium, // Use Premium component
-  GridColDef,
-  GridColumnVisibilityModel,
-  DataGridPremiumProps, // Use Premium props type
-  GridInitialState, // Corrected: Use base type
-  GridColumnOrderChangeParams,
-  GridSortModel,
-  GridRowGroupingModel // Keep grouping model
-  // GridRowGroupingOptions removed - not directly exported?
 } from '@mui/x-data-grid-premium';
 import Box from '@mui/material/Box';
 import { AdvancedDataGridProps } from './AdvancedDataGrid.types'; // This might need update too
@@ -26,7 +18,7 @@ import { AdvancedDataGridProps } from './AdvancedDataGrid.types'; // This might 
 const AdvancedDataGrid = <T extends Record<string, any>>({
   rows,
   columns,
-  height = '70vh',
+  height = '80vh',
   width = '100%',
   // Feature Flags
   disableColumnResize = false,
@@ -46,7 +38,7 @@ const AdvancedDataGrid = <T extends Record<string, any>>({
   initialState,
   // Rest are picked from DataGridPremiumProps (loading, pagination, filter, etc.)
   ...restOfGridProps
-}: AdvancedDataGridProps<T>) => { // Ensure AdvancedDataGridProps aligns with Premium
+}: AdvancedDataGridProps<T>) => { // This defines the props type for the component using AdvancedDataGridProps interface with generic type T
 
   return (
     <Box sx={{ height, width }}>
@@ -62,9 +54,7 @@ const AdvancedDataGrid = <T extends Record<string, any>>({
         // Visibility props
         columnVisibilityModel={columnVisibilityModel}
         onColumnVisibilityModelChange={onColumnVisibilityModelChange}
-        // Order props (passed explicitly)
-        columnOrder={columnOrder}
-        onColumnOrderChange={onColumnOrderChange}
+        // Order props are handled via initialState or specific DataGridPremium features
         // Sorting props
         sortModel={sortModel}
         onSortModelChange={onSortModelChange}
@@ -74,6 +64,8 @@ const AdvancedDataGrid = <T extends Record<string, any>>({
         groupingColDef={groupingColDef} // Type is GridColDef | Partial<GridColDef> | undefined
         // Initial state
         initialState={initialState}
+        // Disable virtualization to potentially fix scrolling render issues
+        disableVirtualization={true} 
         // Default Premium features (can be overridden)
         // disableRowGrouping // To disable grouping if needed
         {...restOfGridProps}

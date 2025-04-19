@@ -21,8 +21,7 @@ const theme = createTheme({
 
 // Define columns for the Patient data
 const patientColumns: GridColDef<Patient>[] = [
-  // Use renderCell for formatting Dates
-  { field: 'id', headerName: 'ID', width: 150, hideable: false }, // Example: make ID not hideable
+  { field: 'id', headerName: 'ID', width: 150, hideable: true },
   { field: 'firstName', headerName: 'First Name', width: 130 },
   { field: 'lastName', headerName: 'Last Name', width: 130 },
   {
@@ -33,6 +32,7 @@ const patientColumns: GridColDef<Patient>[] = [
     valueGetter: (value) => new Date(value),
   },
   { field: 'diagnosis', headerName: 'Diagnosis', width: 180 },
+  
   {
     field: 'admissionDate',
     headerName: 'Admission Date',
@@ -40,7 +40,7 @@ const patientColumns: GridColDef<Patient>[] = [
     width: 180,
     valueGetter: (value) => new Date(value),
   },
-  { field: 'status', headerName: 'Status', width: 100 },
+   
 ];
 
 function App() {
@@ -52,17 +52,12 @@ function App() {
       <AdvancedDataGrid<Patient>
         rows={mockPatients}
         columns={patientColumns}
-        // Example: Enable checkbox selection
         checkboxSelection
-        // Example: Disable grouping initially if desired
-        // disableRowGrouping
-        // Example: Set initial sort order
         initialState={{
           sorting: {
             sortModel: [{ field: 'lastName', sort: 'asc' }],
           },
         }}
-        // Pass other DataGridPremium props as needed
       />
     </ThemeProvider>
   );
