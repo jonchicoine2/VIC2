@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 // Import Premium components and types
 import {
   DataGridPremium, // Use Premium component
 } from '@mui/x-data-grid-premium';
-import Box from '@mui/material/Box';
+import Box from '@mui/material/Box'; // Re-import Box
 import { AdvancedDataGridProps } from './AdvancedDataGrid.types'; // This might need update too
 
 /**
@@ -16,59 +16,75 @@ import { AdvancedDataGridProps } from './AdvancedDataGrid.types'; // This might 
  * @returns {React.ReactElement} The rendered data grid.
  */
 const AdvancedDataGrid = <T extends Record<string, any>>({
+  // Explicitly defined props for the wrapper
   rows,
   columns,
-  height = '80vh',
-  width = '100%',
-  // Feature Flags
+  // Size props (new)
+  height,
+  width,
+  // Feature Flags (also explicitly handled by wrapper)
   disableColumnResize = false,
   disableColumnReorder = false,
   disableRowGrouping = false,
   disableMultipleColumnsSorting = false,
-  // Explicit props
-  columnVisibilityModel,
-  onColumnVisibilityModelChange,
-  columnOrder,
-  onColumnOrderChange,
-  sortModel,
-  onSortModelChange,
-  rowGroupingModel,
-  onRowGroupingModelChange,
-  groupingColDef,
-  initialState,
-  // Rest are picked from DataGridPremiumProps (loading, pagination, filter, etc.)
-  ...restOfGridProps
-}: AdvancedDataGridProps<T>) => { // This defines the props type for the component using AdvancedDataGridProps interface with generic type T
+  // Other props, including any existing sx prop from the caller
+  sx, // Keep sx prop extraction
+  // Collect ALL other props (including slots, slotProps, initialState, loading, etc.)
+  ...rest // Use a simple name like rest
+}: AdvancedDataGridProps<T>) => {
+  const apiRef = React.useRef<any>(null);
+
+  // Disable column virtualization to avoid disappearing columns during fast vertical scroll
+  useEffect(() => {
+    if (apiRef.current?.unstable_setColumnVirtualization) {
+      apiRef.current.unstable_setColumnVirtualization(false);
+    }
+  }, []);
 
   return (
-    <Box sx={{ height, width }}>
-      {/* Use DataGridPremium */} 
+    <Box sx={{ 
+      height: '100%',
+      width: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      '& .MuiDataGrid-root': {
+        border: 'none',
+        flex: 1,
+      },
+      '& .MuiDataGrid-cell': {
+        borderBottom: 1,
+        borderColor: 'divider',
+      },
+      '& .MuiDataGrid-columnHeaders': {
+        borderBottom: 2,
+        borderColor: 'divider',
+      },
+      '& .MuiDataGrid-columnHeader': {
+        padding: '0 16px',
+        '&:focus': {
+          outline: 'none',
+        },
+      },
+    }}> 
       <DataGridPremium<T>
         rows={rows}
         columns={columns}
-        // Pass down feature flags
         disableColumnResize={disableColumnResize}
         disableColumnReorder={disableColumnReorder}
         disableRowGrouping={disableRowGrouping}
         disableMultipleColumnsSorting={disableMultipleColumnsSorting}
-        // Visibility props
-        columnVisibilityModel={columnVisibilityModel}
-        onColumnVisibilityModelChange={onColumnVisibilityModelChange}
-        // Order props are handled via initialState or specific DataGridPremium features
-        // Sorting props
-        sortModel={sortModel}
-        onSortModelChange={onSortModelChange}
-        // Grouping props
-        rowGroupingModel={rowGroupingModel}
-        onRowGroupingModelChange={onRowGroupingModelChange}
-        groupingColDef={groupingColDef} // Type is GridColDef | Partial<GridColDef> | undefined
-        // Initial state
-        initialState={initialState}
-        // Disable virtualization to potentially fix scrolling render issues
-        disableVirtualization={true} 
-        // Default Premium features (can be overridden)
-        // disableRowGrouping // To disable grouping if needed
-        {...restOfGridProps}
+        autoHeight={false}
+        apiRef={apiRef}
+        slots={{
+          ...rest.slots,
+        }}
+        sx={{
+          ...sx,
+          width: '100%',
+          height: '100%',
+          flex: 1,
+        }}
+        {...rest}
       />
     </Box>
   );
