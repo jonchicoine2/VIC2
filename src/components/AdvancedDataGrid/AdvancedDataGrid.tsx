@@ -41,10 +41,13 @@ const AdvancedDataGrid = <T extends Record<string, any>>({
     }
   }, []);
 
+  const containerHeight = height ?? '100%';
+  const containerWidth = width ?? '100%';
+
   return (
     <Box sx={{ 
-      height: '100%',
-      width: '100%',
+      height: containerHeight,
+      width: containerWidth,
       display: 'flex',
       flexDirection: 'column',
       '& .MuiDataGrid-root': {
