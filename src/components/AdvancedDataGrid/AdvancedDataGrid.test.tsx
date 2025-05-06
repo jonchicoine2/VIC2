@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, within, waitFor } from '@testing-library/react';
 import { GridColDef, GridColumnVisibilityModel, GridColumnOrderChangeParams, GridSortModel } from '@mui/x-data-grid-pro';
 import { GridRowGroupingModel } from '@mui/x-data-grid-premium';
 import AdvancedDataGrid from './AdvancedDataGrid';
@@ -9,6 +9,19 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
+import { saveCurrentView, loadGridView } from '../../lib/gridViewHelpers';
+import { listViews, deleteView } from '../../lib/gridViewStore';
+
+// Mock the grid view helpers
+vi.mock('../../lib/gridViewHelpers', () => ({
+  saveCurrentView: vi.fn(),
+  loadGridView: vi.fn(),
+}));
+
+vi.mock('../../lib/gridViewStore', () => ({
+  listViews: vi.fn(),
+  deleteView: vi.fn(),
+}));
 
 // Basic columns definition for testing
 const testColumns: GridColDef<Patient>[] = [
@@ -257,4 +270,105 @@ describe('AdvancedDataGrid', () => {
     expect(header).toHaveStyle('color: rgb(255, 255, 255)');
   });
 
+});
+
+// Add new test suite for grid view functionality
+describe('Grid View Management', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    // Mock initial empty views list
+    (listViews as ReturnType<typeof vi.fn>).mockReturnValue([]);
+  });
+
+  it('should show save view dialog when clicking save button', async () => {
+    const user = userEvent.setup();
+    render(<StatefulAdvancedDataGridMinimal rows={testRows} columns={testColumns} />);
+    
+    // Find and click save button
+    const saveButton = screen.getByRole('button', { name: /save/i });
+    await user.click(saveButton);
+    
+    // Check dialog appears
+    expect(screen.getByRole('dialog', { name: /save current view/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/view name/i)).toBeInTheDocument();
+  });
+
+  it('should save view when entering name and clicking save', async () => {
+    const user = userEvent.setup();
+    const mockSave = saveCurrentView as ReturnType<typeof vi.fn>;
+    
+    render(<StatefulAdvancedDataGridMinimal rows={testRows} columns={testColumns} />);
+    
+    // Open save dialog and enter name
+    const saveButton = screen.getByRole('button', { name: /save/i });
+    await user.click(saveButton);
+    const nameInput = screen.getByLabelText(/view name/i);
+    await user.type(nameInput, 'Test View');
+    
+    // Click save in dialog
+    const dialogSaveButton = screen.getByRole('button', { name: /save$/i });
+    await user.click(dialogSaveButton);
+    
+    // Verify save was called
+    expect(mockSave).toHaveBeenCalledWith('Test View', expect.any(Object));
+  });
+
+  it('should load view when selecting from dropdown', async () => {
+    const user = userEvent.setup();
+    const mockLoad = loadGridView as ReturnType<typeof vi.fn>;
+    const mockViews = [
+      { name: 'Test View', state: {}, createdAt: new Date().toISOString(), version: 1 }
+    ];
+    
+    (listViews as ReturnType<typeof vi.fn>).mockReturnValue(mockViews);
+    mockLoad.mockReturnValue(true);
+    
+    render(<StatefulAdvancedDataGridMinimal rows={testRows} columns={testColumns} />);
+    
+    // Open load dialog
+    const loadButton = screen.getByRole('button', { name: /load/i });
+    await user.click(loadButton);
+    
+    // Select view and load
+    const viewSelect = screen.getByLabelText(/saved views/i);
+    await user.click(viewSelect);
+    const option = screen.getByRole('option', { name: /test view/i });
+    await user.click(option);
+    
+    const loadDialogButton = screen.getByRole('button', { name: /load$/i });
+    await user.click(loadDialogButton);
+    
+    // Verify load was called
+    expect(mockLoad).toHaveBeenCalledWith('Test View', expect.any(Object));
+  });
+
+  it('should delete view when clicking delete button', async () => {
+    const user = userEvent.setup();
+    const mockDelete = deleteView as ReturnType<typeof vi.fn>;
+    const mockViews = [
+      { name: 'Test View', state: {}, createdAt: new Date().toISOString(), version: 1 }
+    ];
+    
+    (listViews as ReturnType<typeof vi.fn>).mockReturnValue(mockViews);
+    mockDelete.mockReturnValue(true);
+    
+    render(<StatefulAdvancedDataGridMinimal rows={testRows} columns={testColumns} />);
+    
+    // Open load dialog
+    const loadButton = screen.getByRole('button', { name: /load/i });
+    await user.click(loadButton);
+    
+    // Select view
+    const viewSelect = screen.getByLabelText(/saved views/i);
+    await user.click(viewSelect);
+    const option = screen.getByRole('option', { name: /test view/i });
+    await user.click(option);
+    
+    // Click delete
+    const deleteButton = screen.getByRole('button', { name: /delete/i });
+    await user.click(deleteButton);
+    
+    // Verify delete was called
+    expect(mockDelete).toHaveBeenCalledWith('Test View');
+  });
 }); 

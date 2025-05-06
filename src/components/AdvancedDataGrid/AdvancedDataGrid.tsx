@@ -2,9 +2,12 @@ import React, { useEffect } from 'react';
 // Import Premium components and types
 import {
   DataGridPremium, // Use Premium component
+  useGridApiRef,
+  GridToolbar,
 } from '@mui/x-data-grid-premium';
 import Box from '@mui/material/Box'; // Re-import Box
 import { AdvancedDataGridProps } from './AdvancedDataGrid.types'; // This might need update too
+import GridToolbarViewSelector from './components/GridToolbarViewSelector';
 
 /**
  * An advanced data grid component built on top of MUI DataGridPremium.
@@ -32,17 +35,28 @@ const AdvancedDataGrid = <T extends Record<string, any>>({
   // Collect ALL other props (including slots, slotProps, initialState, loading, etc.)
   ...rest // Use a simple name like rest
 }: AdvancedDataGridProps<T>) => {
-  const apiRef = React.useRef<any>(null);
+  // Replace useRef with useGridApiRef for proper typing and access to DataGrid API
+  const apiRef = useGridApiRef();
 
   // Disable column virtualization to avoid disappearing columns during fast vertical scroll
   useEffect(() => {
     if (apiRef.current?.unstable_setColumnVirtualization) {
       apiRef.current.unstable_setColumnVirtualization(false);
     }
-  }, []);
+  }, [apiRef]);
 
   const containerHeight = height ?? '100%';
   const containerWidth = width ?? '100%';
+
+  // Custom toolbar component that combines standard toolbar with view selector
+  const CustomToolbar = React.useCallback(() => {
+    return (
+      <>
+        <GridToolbarViewSelector />
+        <GridToolbar />
+      </>
+    );
+  }, []);
 
   return (
     <Box sx={{ 
@@ -80,6 +94,7 @@ const AdvancedDataGrid = <T extends Record<string, any>>({
         apiRef={apiRef}
         slots={{
           ...rest.slots,
+          toolbar: CustomToolbar,
         }}
         sx={{
           ...sx,
