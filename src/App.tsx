@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { LicenseInfo } from '@mui/x-license';
-import { GridColDef } from '@mui/x-data-grid-premium';
+import { GridColDef, GridToolbar } from '@mui/x-data-grid-premium';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
@@ -12,9 +12,8 @@ import { mockPatients } from './data/mockPatients';
 import type { Patient } from './types/Patient';
 import './App.css'; // Keep existing styles if needed
 
-// Set the license key for MUI Premium features
-// REPLACE WITH YOUR ACTUAL KEY
-// LicenseInfo.setLicenseKey('YOUR_LICENSE_KEY'); // Keep commented out for now
+// IMPORTANT: Do not commit real license keys into public repos.
+LicenseInfo.setLicenseKey('9bbf0ba30db5f38d5a7165fc5eed959aTz0xMTE5NzQsRT0xNzc3MTYxNTk5MDAwLFM9cHJlbWl1bSxMTT1zdWJzY3JpcHRpb24sUFY9aW5pdGlhbCxLVj0y');
 
 // Define a basic theme
 const theme = createTheme({
@@ -35,16 +34,17 @@ const patientColumns: GridColDef<Patient>[] = [
     headerName: 'Date of Birth',
     type: 'date',
     width: 120,
-    valueGetter: ({row}: {row: Patient}) => {
-      if (!row || !row.dob) return null;
-      return new Date(row.dob);
+    valueGetter: (params: any) => {
+      if (!params?.row?.dob) return null;
+      return new Date(params.row.dob);
     },
-    valueFormatter: (value) => {
-      if (!value) return '';
-      return new Date(value).toLocaleDateString('en-US', { 
-        month: 'numeric', 
-        day: 'numeric', 
-        year: 'numeric' 
+    valueFormatter: (params: any) => {
+      const raw = params?.value;
+      if (!raw) return '';
+      return new Date(raw as string | number | Date).toLocaleDateString('en-US', {
+        month: 'numeric',
+        day: 'numeric',
+        year: 'numeric',
       });
     }
   },
@@ -58,16 +58,17 @@ const patientColumns: GridColDef<Patient>[] = [
     headerName: 'Admission Date',
     type: 'dateTime',
     width: 160,
-    valueGetter: (value, row) => {
-      if (!row || !row.admissionDate) return null;
-      return new Date(row.admissionDate);
+    valueGetter: (params: any) => {
+      if (!params?.row?.admissionDate) return null;
+      return new Date(params.row.admissionDate);
     },
-    valueFormatter: (value) => {
-      if (!value) return '';
-      return new Date(value).toLocaleDateString('en-US', { 
-        month: 'numeric', 
-        day: 'numeric', 
-        year: 'numeric' 
+    valueFormatter: (params: any) => {
+      const raw = params?.value;
+      if (!raw) return '';
+      return new Date(raw as string | number | Date).toLocaleDateString('en-US', {
+        month: 'numeric',
+        day: 'numeric',
+        year: 'numeric',
       });
     }
   },
@@ -115,15 +116,11 @@ function App() {
                   groupingColDef={{
                     headerName: 'Group',
                   }}
-                  columnBufferPx={2000}
                   showToolbar
                   initialState={{
                     sorting: {
                       sortModel: [{ field: 'lastName', sort: 'asc' }],
                     },
-                    // rowGrouping: {
-                    //   model: ['lastName']
-                    // },
                   }}
                 />
               </Box>

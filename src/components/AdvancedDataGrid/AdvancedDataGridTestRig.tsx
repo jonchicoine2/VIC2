@@ -36,6 +36,7 @@ const AdvancedDataGridTestRig: React.FC = () => {
         // Feature flags passed
         disableColumnReorder={false}
         disableRowGrouping={false}
+        showToolbar
         groupingColDef={{
           headerName: 'Group',
         }}
