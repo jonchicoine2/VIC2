@@ -91,10 +91,12 @@ const AdvancedDataGrid = <T extends Record<string, any>>({
         disableRowGrouping={disableRowGrouping}
         disableMultipleColumnsSorting={disableMultipleColumnsSorting}
         autoHeight={false}
+        disableVirtualization
         apiRef={apiRef}
+        showToolbar
         slots={{
           ...rest.slots,
-          toolbar: CustomToolbar,
+           toolbar: CustomToolbar,
         }}
         sx={{
           ...sx,
