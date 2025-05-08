@@ -12,6 +12,7 @@ import './App.css'; // Keep existing styles if needed
 // REPLACE WITH YOUR ACTUAL KEY
 LicenseInfo.setLicenseKey('YOUR_PREMIUM_LICENSE_KEY'); 
 
+//jjc
 // Define a basic theme
 const theme = createTheme({
   palette: {
