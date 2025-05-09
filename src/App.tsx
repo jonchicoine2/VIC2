@@ -15,7 +15,7 @@ import './App.css'; // Keep existing styles if needed
 // IMPORTANT: Do not commit real license keys into public repos.
 LicenseInfo.setLicenseKey('9bbf0ba30db5f38d5a7165fc5eed959aTz0xMTE5NzQsRT0xNzc3MTYxNTk5MDAwLFM9cHJlbWl1bSxMTT1zdWJzY3JpcHRpb24sUFY9aW5pdGlhbCxLVj0y');
 
-//jjc2
+//jjc2...
 // Define a basic theme
 const theme = createTheme({
   palette: {
