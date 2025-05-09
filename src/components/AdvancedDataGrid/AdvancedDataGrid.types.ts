@@ -1,34 +1,16 @@
-import { GridColDef, DataGridPremiumProps, GridRowGroupingModel, GridGroupingColDefOverride } from '@mui/x-data-grid-premium';
-import { GridSortModel, GridColumnOrderChangeParams } from '@mui/x-data-grid-pro';
+import { GridColDef, DataGridPremiumProps} from '@mui/x-data-grid-premium';
+//import { GridSortModel, GridColumnOrderChangeParams } from '@mui/x-data-grid-pro';
 
 /**
- * Props for the AdvancedDataGrid component.
- * Leverages MUI DataGridPremium features.
+ * Props specific to the AdvancedDataGrid wrapper component.
  * @template T The type of the data object for each row.
  */
-export interface AdvancedDataGridProps<T extends Record<string, any>> 
-  // Pick relevant props from DataGridPremiumProps to expose as base
-  extends Pick<
-    DataGridPremiumProps<T>, 
-    'loading' | 'autoHeight' | 'checkboxSelection' | 'disableRowSelectionOnClick' |
-    'pagination' | 'pageSizeOptions' | 'paginationModel' | 'onPaginationModelChange' |
-    'sortingMode' | 'sortModel' | 'onSortModelChange' |
-    'filterMode' | 'filterModel' | 'onFilterModelChange' |
-    'density' | 'onStateChange' | 
-    'columnVisibilityModel' | 'onColumnVisibilityModelChange' |
-    'rowGroupingModel' | 'onRowGroupingModelChange' |
-    'groupingColDef' | 
-    'initialState' | 
-    'apiRef' | // Expose apiRef for advanced control
-    'slots' | 'slotProps' // Use slots/slotProps (MUI v6+ style)
-    // Add more premium features as needed: aggregation, excel export, etc.
-  >
-{
+interface AdvancedDataGridWrapperProps<T extends Record<string, any>> {
   /** The data rows to display. */
   rows: T[];
   /** The column definitions. */
   columns: GridColDef<T>[]; 
-  /** Optional height for the grid container. Defaults to '70vh'. */
+  /** Optional height for the grid container. Defaults to '80vh'. */
   height?: string | number;
   /** Optional width for the grid container. Defaults to '100%'. */
   width?: string | number;
@@ -44,8 +26,19 @@ export interface AdvancedDataGridProps<T extends Record<string, any>>
   disableMultipleColumnsSorting?: boolean;
 
   // --- Explicit props (might override Picked ones if needed) ---
+  // Note: columnOrder/onColumnOrderChange are handled by DataGridPremium directly
+  // if passed via ...rest, so maybe don't need explicit definition here unless
+  // the wrapper itself needs to intercept them.
+  // Keeping them for now just in case, but they aren't used in the wrapper itself.
   /** Controlled column order state. */
-  columnOrder?: string[];
+  // columnOrder?: string[]; 
   /** Callback fired when column order changes. */
-  onColumnOrderChange?: (params: GridColumnOrderChangeParams) => void; 
-} 
+  // onColumnOrderChange?: (params: GridColumnOrderChangeParams) => void; 
+}
+
+/**
+ * Combined props for AdvancedDataGrid:
+ * Includes wrapper-specific props plus all optional DataGridPremiumProps.
+ */
+export type AdvancedDataGridProps<T extends Record<string, any>> = 
+  AdvancedDataGridWrapperProps<T> & Partial<Omit<DataGridPremiumProps<T>, 'rows' | 'columns'>>; // Allow all other Premium props, ensuring rows/columns types are consistent 
