@@ -17,12 +17,15 @@
     "@mui/material": "^7.0.2",
     "@mui/x-data-grid-premium": "^8.0.0",
     "@mui/x-data-grid-pro": "^8.0.0",
+    "@mui/x-date-pickers": "^8.3.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
+    "date-fns": "^4.1.0",
     "jsdom": "^26.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-router-dom": "^7.6.0",
     "vitest": "^3.1.1"
   },
   "devDependencies": {

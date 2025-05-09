@@ -25,6 +25,16 @@ interface AdvancedDataGridWrapperProps<T extends Record<string, any>> {
   /** Set to true to disable multi-column sorting. Defaults to false. */
   disableMultipleColumnsSorting?: boolean;
 
+  // --- Editing Features ---
+  /** Set to true to enable row editing. Defaults to false. */
+  editable?: boolean;
+  /** Callback fired when a row is updated. */
+  onRowUpdate?: (updatedRow: T) => void;
+  /** Function to customize form fields for the edit dialog. If not provided, all fields will be editable. */
+  getEditDialogFields?: (row: T) => Array<keyof T>;
+  /** Custom validation function for the edit form. */
+  validateEditForm?: (row: T) => Record<string, string>;
+
   // --- Explicit props (might override Picked ones if needed) ---
   // Note: columnOrder/onColumnOrderChange are handled by DataGridPremium directly
   // if passed via ...rest, so maybe don't need explicit definition here unless
